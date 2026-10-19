@@ -47,6 +47,9 @@ class SentenceTransformerEmbedder:
     def _load(self):
         if self._model is None:
             from sentence_transformers import SentenceTransformer  # heavy import, load lazily
+            from transformers.utils import logging as hf_logging
+
+            hf_logging.disable_progress_bar()
 
             log.info("loading embedding model %s", self.model_name)
             try:  # use the local cache first: no network after the first download
