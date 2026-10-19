@@ -3,7 +3,7 @@
 Findings from profiling the raw inputs (`data/raw/tech_news.csv`, `data/raw/company_metadata.json`) before writing any cleaner.
 Exploration was done interactively in a local notebook (not versioned, see ADR-004); this file is the durable record.
 
-Status: **in progress** (Phase 1).
+Status: **complete** (closed 2026-10-19; numbers re-verified against the pipeline output).
 
 ---
 
@@ -11,7 +11,18 @@ Status: **in progress** (Phase 1).
 
 - 750 rows.
 - `article_id`: 750 distinct, 0 nulls → reliable natural key.
-- `url`: 750 distinct → no duplicate articles by URL. Duplicates by title not checked yet.
+- `url`: 750 distinct → no duplicate articles by URL.
+- Titles are templated: **303 distinct titles** for 750 rows; 197 titles occur more than once, covering 644 rows. Summaries are even more repetitive: **12 distinct summaries**. Duplicate titles are *not* duplicate articles (different ids, URLs, companies, dates), so nothing is deduplicated by title; it does limit how much semantic search can discriminate (ADR-018).
+- Columns: `article_id, title, company_name, published_date, category, revenue, summary, url, author, word_count`.
+
+Null / empty share per column:
+
+| Column | Empty | % |
+|---|---|---|
+| article_id, title, company_name, published_date, category, summary, url | 0 | 0% |
+| revenue | 66 (+ 85 `Not disclosed`, 41 `N/A`) | 8.8% (25.6% unusable) |
+| author | 204 | 27.2% |
+| word_count | 69 | 9.2% (stored as `2569.0`-style floats) |
 
 ### 1.1 `revenue` (source of ARR observations)
 
@@ -27,6 +38,23 @@ Status: **in progress** (Phase 1).
   - Unusual magnitudes kept in the "wrong" unit (e.g. `$79170.0M`, i.e. ~$79B expressed in millions).
 - Ranges with a hyphen (e.g. `$87.2M - $96.4M`, `$0.982B - $1.086B`) → midpoint required.
 - Non-USD values look like they were generated from round USD amounts and converted back with the assignment's FX rates (e.g. `£19,685,039,370 × 1.27 ≈ $25,000,000,000`; `¥360,000,000,000 ÷ 150 = $2,400,000,000`). Converting back may yield values a few dollars off a round number, so the rounding rule matters and must be documented.
+- Pattern catalog (digits → `9`, letters → `a`, runs collapsed). Every pattern has a unit test in `tests/test_arr.py`:
+
+| Pattern | Rows | Example shape | Parsed as |
+|---|---|---|---|
+| `$9.9a` | 134 | `$340.0M`, `$1.380B` | USD × unit |
+| `$9.9 a` | 106 | `$0.760 billion` | USD × unit word |
+| `a a` | 85 | `Not disclosed` | `undisclosed` |
+| (empty) | 66 | | `missing` |
+| `$9.9a - $9.9a` | 58 | `$87.2M - $96.4M` | midpoint |
+| `9.9a a` | 49 | `1010.0M USD` | USD (trailing code) |
+| `a/a` | 41 | `N/A` | `missing` |
+| `$9,9,9,9` / `$9,9,9` | 38 / 15 | `$5,200,000,000` | USD, full figure |
+| `¥9,9,9,9` / `¥9,9,9,9,9` / `¥9,9,9` | 34 / 19 / 2 | `¥177,000,000,000` | ÷ 150 |
+| `€9,9,9,9` / `€9,9,9` | 30 / 23 | `€86,363,636` | × 1.1 |
+| `£9,9,9,9` / `£9,9,9` | 28 / 22 | `£61,417,322,835` | × 1.27 |
+
+  Result: 558 valid (342 USD single, 58 USD ranges, 55 JPY, 53 EUR, 50 GBP), 107 missing, 85 undisclosed, 0 unparseable, 0 non-positive. Valid ARR ranges from $5M to $102.6B.
 - Pitfall: DuckDB `LIKE` is case-sensitive; profiling patterns with `LIKE '%B%'` would miss lowercase variants. Use `ILIKE` or regex-based pattern classification.
 
 ### 1.2 `published_date`
@@ -44,7 +72,24 @@ At least 5 formats observed:
 
 - Ambiguous values exist (both parts ≤ 12, e.g. `02-04-2023`, `03/12/2024`).
 - Hypothesis to verify: the separator determines the convention (`/` → US, `-` → EU). If no counter-example exists (a `/` value with day > 12 in the first position, or a `-` value with month > 12 in the second), the separator can resolve ambiguity deterministically.
-- Pending: count per format and number of ambiguous values.
+Counts per format (all 750 parse; 0 missing, 0 invalid):
+
+| Format | Rows |
+|---|---|
+| Month name (`August 15, 2023` / `21 Feb 2020`) | 261 (120 / 141) |
+| `NN-NN-YYYY` | 146 |
+| ISO timestamp | 123 |
+| `NN/NN/YYYY` | 111 |
+| ISO date | 109 |
+
+**Separator hypothesis: refuted for `-`.**
+
+| Separator | First field > 12 (day-first) | Second field > 12 (month-first) | Both ≤ 12 |
+|---|---|---|---|
+| `/` | 0 | 71 | 40 |
+| `-` | 63 | **17** (e.g. `06-21-2024`) | 66 |
+
+`/` is consistently US; `-` mixes both conventions. Rule adopted (ADR-011): value-based when a field is > 12; otherwise `/` → month/day and `-` → day/month (majority), flagged. 106 rows have both fields ≤ 12, of which 13 have day = month (same date either way), leaving **93 truly ambiguous** rows (37 `/`, 56 `-`). Years span 2020–2024 (135, 116, 124, 193, 182); a day/month swap never changes the year.
 
 ### 1.3 `category`
 
@@ -130,17 +175,18 @@ AI-related articles before date and ARR filters (category AI = `Artificial Intel
 | AI by industry only (category is not AI) | 78 |
 
 So the industry branch of the OR adds 78 articles on top of the 161 category-AI ones. The 13 unresolved-company articles cannot carry an ARR observation, so they cannot reach the export.
-- Nulls and sentinel strings per field (`null`, `""`, `N/A`).
-- Types and ranges of `employee_count`, `founded_year`, `is_public`.
+- Types and nulls: `founded_year` and `employee_count` are JSON integers, `is_public` JSON booleans, `headquarters`/`industry` strings; no sentinel strings. Only `stock_ticker` has nulls (14 of 21). No duplicate top-level keys (checked with `object_pairs_hook`).
+- Ranges: `employee_count` 3,884–49,545 (none exactly at 10,000 or 30,000; closest 10,144 and 31,018) → 3 Small, 12 Medium, 6 Large. `founded_year` 1995–2018 → no negative company ages on real data.
+- `is_public` vs `stock_ticker` is inconsistent: 5 public companies without ticker, 4 private companies with a ticker. Kept as given, reported as DQ warnings.
 
 ---
 
 ## 3. Open items before closing Phase 1
 
-- [ ] Metadata profile (section 2, pending list).
-- [ ] `revenue` format catalog via regex pattern classification (digits → `9`, letters → `a`).
-- [ ] Date separator hypothesis and count of ambiguous dates.
-- [ ] Null % per column; duplicate titles.
-- [ ] Finish category taxonomy (ADR-005 open points).
+- [x] Metadata profile (section 2).
+- [x] `revenue` format catalog via regex pattern classification (section 1.1).
+- [x] Date separator hypothesis (refuted for `-`) and count of ambiguous dates (section 1.2, ADR-011).
+- [x] Null % per column; duplicate titles (section 1).
+- [x] Finish category taxonomy (ADR-009).
 - [x] Decide role of fuzzy matching (suggestion only, ADR-008).
 - [x] Decide `Meta AI Research` / `Facebook AI Research` (alias of `Meta AI`, ADR-007).
