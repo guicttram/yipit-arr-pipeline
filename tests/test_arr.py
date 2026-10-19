@@ -1,5 +1,5 @@
 """ARR parser. Every revenue shape found in the EDA pattern catalog is a case
-(digits -> 9, letters -> a), with synthetic values."""
+(digits -> 9, letters -> a). Values are invented; only the shapes come from the source."""
 
 import pytest
 
@@ -19,30 +19,30 @@ from yipit_pipeline.cleaning.arr import (
     ("raw", "expected_usd", "method", "currency"),
     [
         # '$9.9a'
-        ("$340.0M", 340_000_000, METHOD_SINGLE, "USD"),
-        ("$1.380B", 1_380_000_000, METHOD_SINGLE, "USD"),
-        ("$79170.0M", 79_170_000_000, METHOD_SINGLE, "USD"),  # large value kept in millions
+        ("$215.0M", 215_000_000, METHOD_SINGLE, "USD"),
+        ("$2.470B", 2_470_000_000, METHOD_SINGLE, "USD"),
+        ("$64320.0M", 64_320_000_000, METHOD_SINGLE, "USD"),  # large value kept in millions
         # '$9.9 a'
-        ("$0.760 billion", 760_000_000, METHOD_SINGLE, "USD"),
+        ("$0.640 billion", 640_000_000, METHOD_SINGLE, "USD"),
         ("$5.2 million", 5_200_000, METHOD_SINGLE, "USD"),
         # '9.9a a'
-        ("1010.0M USD", 1_010_000_000, METHOD_SINGLE, "USD"),
+        ("1230.0M USD", 1_230_000_000, METHOD_SINGLE, "USD"),
         # '$9.9a - $9.9a'
-        ("$87.2M - $96.4M", 91_800_000, METHOD_RANGE, "USD"),
-        ("$23940.0M - $26460.0M", 25_200_000_000, METHOD_RANGE, "USD"),
-        ("$0.982B - $1.086B", 1_034_000_000, METHOD_RANGE, "USD"),
+        ("$41.6M - $45.2M", 43_400_000, METHOD_RANGE, "USD"),
+        ("$11970.0M - $13230.0M", 12_600_000_000, METHOD_RANGE, "USD"),
+        ("$0.491B - $0.543B", 517_000_000, METHOD_RANGE, "USD"),
         # '$9,9,9,9' / '$9,9,9'
         ("$5,200,000,000", 5_200_000_000, METHOD_SINGLE, "USD"),
         ("$750,000", 750_000, METHOD_SINGLE, "USD"),
         # '€9,9,9,9' / '€9,9,9' (x 1.1)
-        ("€86,363,636", 95_000_000, METHOD_SINGLE, "EUR"),  # 94,999,999.6 -> rounds up
+        ("€27,272,727", 30_000_000, METHOD_SINGLE, "EUR"),  # 29,999,999.7 -> rounds up
         ("€500,000", 550_000, METHOD_SINGLE, "EUR"),
         # '£9,9,9,9' / '£9,9,9' (x 1.27)
-        ("£19,685,039,370", 25_000_000_000, METHOD_SINGLE, "GBP"),  # 24,999,999,999.9
-        ("£61,417,322,835", 78_000_000_000, METHOD_SINGLE, "GBP"),
+        ("£12,345,678,901", 15_679_012_204, METHOD_SINGLE, "GBP"),  # ...204.27 -> rounds down
+        ("£31,496,062,992", 40_000_000_000, METHOD_SINGLE, "GBP"),
         ("£1,000,000", 1_270_000, METHOD_SINGLE, "GBP"),
         # '¥9,9,9,9' / '¥9,9,9,9,9' / '¥9,9,9' (/ 150)
-        ("¥177,000,000,000", 1_180_000_000, METHOD_SINGLE, "JPY"),
+        ("¥123,456,000,000", 823_040_000, METHOD_SINGLE, "JPY"),
         ("¥1,500,000,000,000", 10_000_000_000, METHOD_SINGLE, "JPY"),
         ("¥150,000", 1_000, METHOD_SINGLE, "JPY"),
     ],

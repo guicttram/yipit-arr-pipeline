@@ -127,8 +127,8 @@ def _to_usd(amount: _Amount, unit: str | None, currency: str) -> Decimal:
 def parse_arr(raw: object) -> ArrResult:
     """Parse a raw revenue value into USD ARR.
 
-    Accepts formats such as ``$340.0M``, ``$1.380B``, ``$0.760 billion``, ``1010.0M USD``,
-    ``€86,363,636``, ``¥177,000,000,000`` and ranges ``$87.2M - $96.4M`` (midpoint).
+    Accepts formats such as ``$215.0M``, ``$2.470B``, ``$0.640 billion``, ``1230.0M USD``,
+    ``€27,272,727``, ``¥123,456,000,000`` and ranges ``$41.6M - $45.2M`` (midpoint).
     A value without any currency marker is assumed to be USD (``currency`` is then ``None``).
     """
     if raw is None:
