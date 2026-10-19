@@ -182,8 +182,10 @@ articles, 93 ambiguous dates).
   industry labels do not follow real-world intuition (e.g. SpaceX = AI/ML). The pipeline never
   overrides metadata with outside knowledge.
 - **Ambiguous dates.** 93 rows depend on the separator rule; the flag travels to the observation.
-- **Reported ARR is noisy.** Values for one company swing widely between articles; quarterly views
-  expose min/max next to the chosen value.
+- **Reported ARR is not a clean series.** It mostly grows over time, but 13 of 529 observations
+  (11 companies) are lower than the previous one, and 20 of the 156 quarters with several
+  observations hold more than one distinct value. Quarterly views expose min/max next to the
+  chosen value.
 - **Templated text.** 303 distinct titles and 12 distinct summaries for 750 articles limit how much
   semantic search can discriminate; many nearest neighbours are template duplicates (score 1.0).
 

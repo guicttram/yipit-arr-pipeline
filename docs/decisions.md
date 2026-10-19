@@ -158,7 +158,7 @@ This document tracks key architectural decisions, design choices, rejected alter
 - **Status**: Accepted (default, pending review)
 - **Decision**: Latest ARR per company = the observation with the greatest `as_of_date`; ties broken by most recent batch, then highest `article_id`. Quarterly ARR = the last observation within the calendar quarter using the same ordering, exposed with `n_observations`, `min_arr_usd` and `max_arr_usd` for the quarter. Quarters without observations are absent (no carry-forward).
 - **Alternatives Considered**: Average or max per quarter (rejected: ARR is a point-in-time run rate, so "as of the end of the period" is the natural reading; averages blend different dates).
-- **Consequences**: "Latest" and "quarterly" are consistent with each other. Caveat: source ARR values for one company swing widely between articles (synthetic data), so the min/max spread is shown next to the chosen value.
+- **Consequences**: "Latest" and "quarterly" are consistent with each other. Caveat: reported ARR mostly grows over time but is not monotonic (13 of 529 observations are lower than the previous one), and some quarters hold several distinct values, so the min/max spread is shown next to the chosen value.
 
 ---
 
