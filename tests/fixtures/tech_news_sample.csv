@@ -1,0 +1,17 @@
+article_id,title,company_name,published_date,category,revenue,summary,url,author,word_count
+T001,Acme Robotics ships warehouse robot arm,Acme Robotics,2022-01-01,AI/ML,$60M,Robot arm for warehouse picking reaches general availability.,https://example.test/t001,Test Author,800.0
+T002,Acme Robotics opens new office,ACME Robotics,12/31/2024,Software,"€50,000,000",New office opened to support enterprise robot customers.,https://example.test/t002,,
+T003,Globex Cloud model hits threshold,Globex Cloud,2023-06-15,Machine Learning,$50M,Machine learning platform reaches exactly fifty million.,https://example.test/t003,Test Author,500.0
+T004,Globex Cloud AI story from 2021,Globex Cloud,2021-12-31,Artificial Intelligence,$90M,Late 2021 artificial intelligence story.,https://example.test/t004,Test Author,450.0
+T005,Globex Cloud AI story from 2025,Globex Cloud,2025-01-01,AI & ML,$90M,Early 2025 artificial intelligence story.,https://example.test/t005,Test Author,450.0
+T006,Globex Cloud launches vision model,Globex Cloud,15-03-2023,AI & ML,$0.2B,Computer vision model for retail shelves.,https://example.test/t006,Test Author,700.0
+T007,Zyx Labs raises seed round,Zyx Labs,2023-05-05,AI/ML,$500M,Language model startup not present in metadata.,https://example.test/t007,Test Author,300.0
+T008,Initech payments growth,Initech,"March 3, 2023",FinTech,$70M - $90M,Payments volume grows for small banks.,https://example.test/t008,Test Author,650.0
+T009,Initech lending update,Initech,02-04-2023,Finance,Not disclosed,Lending product update for banks.,https://example.test/t009,Test Author,600.0
+T010,Initech treasury update,Initech,03/04/2023,Finance,N/A,Treasury product update for banks.,https://example.test/t010,Test Author,610.0
+T011,Umbrella Data dashboards,Umbrella Data,2024-02-29T10:00:00Z,Data Analytics,"¥15,000,000,000",Dashboards for analytics teams.,https://example.test/t011,Test Author,720.0
+T012,Umbrella Data storage,Umbrella Data,not a date,Big Data,£10M,Storage engine for large datasets.,https://example.test/t012,Test Author,710.0
+T013,Hooli early news,Hooli,2021-07-01,SaaS,$5M,Collaboration suite announced before founding year.,https://example.test/t013,Test Author,400.0
+T014,Hooli quantum teaser,Hooli,2024-03-10,Quantum Computing,-$5M,Quantum computing teaser with negative revenue.,https://example.test/t014,Test Author,350.0
+T015,Acme Robotics garbled revenue,Acme Robotics,2024-05-20,AI/ML,$abc,Revenue field is garbled.,https://example.test/t015,Test Author,330.0
+T016,Acme Robotics robot fleet,Acme Robotics Inc.,21 Feb 2024,AI/ML,$75M,,https://example.test/t016,Test Author,900.0

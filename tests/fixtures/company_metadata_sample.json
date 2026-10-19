@@ -1,0 +1,7 @@
+{
+  "Acme Robotics Inc.": {"founded_year": 2010, "headquarters": "Testville, ZZ", "employee_count": 25000, "industry": "AI/ML", "is_public": true, "stock_ticker": "ACME"},
+  "Globex Cloud": {"founded_year": 2005, "headquarters": "Sampleton, ZZ", "employee_count": 9999, "industry": "Cloud Computing", "is_public": false, "stock_ticker": null},
+  "Initech": {"founded_year": 2001, "headquarters": "Mockford, ZZ", "employee_count": 30000, "industry": "FinTech", "is_public": true, "stock_ticker": null},
+  "Umbrella Data": {"founded_year": 1999, "headquarters": "Fakeburg, ZZ", "employee_count": 30001, "industry": "Data Analytics", "is_public": false, "stock_ticker": "UMBR"},
+  "Hooli": {"founded_year": 2023, "headquarters": "Dummy City, ZZ", "employee_count": 10000, "industry": "SaaS", "is_public": true, "stock_ticker": "HOOL"}
+}
