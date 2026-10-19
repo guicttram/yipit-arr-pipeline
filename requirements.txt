@@ -1,0 +1,12 @@
+# Direct dependencies only, pinned. torch comes from the CPU-only index (ADR-002).
+--extra-index-url https://download.pytorch.org/whl/cpu
+duckdb==1.5.6
+pandas==3.0.6
+numpy==2.4.6
+pyarrow==26.0.0
+sentence-transformers==6.1.0
+torch==2.14.1+cpu
+rapidfuzz==3.14.6
+pytest==9.1.1
+pytest-cov==7.1.0
+ruff==0.17.1

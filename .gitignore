@@ -1,0 +1,44 @@
+.env
+.env.*
+!.env.example
+
+.venv/
+data/
+outputs/
+AGENTS.md
+.cache
+models/
+htmlcov/
+
+.duckdb
+*.duckdb
+*.duckdb.wal
+
+*.csv
+*.parquet
+*.npy
+*.pdf
+!tests/fixtures/*.csv
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Notebooks / exploratory
+*.ipynb
+.ipynb_checkpoints/
+notebooks/
+# Personal study notes
+INTERVIEW_PREP.md
+deliverables/
+
+# Additional artifacts
+*.db
+*.npz
+.cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
